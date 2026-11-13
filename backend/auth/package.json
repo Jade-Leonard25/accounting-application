@@ -1,0 +1,32 @@
+{
+  "name": "backend",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "bun run index.ts",
+    "dev": "bun --hot index.ts",
+    "typecheck": "bun check"
+  },
+  "peerDependencies": {
+    "typescript": "^7"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1169.0",
+    "@better-auth/drizzle-adapter": "^1.7.22",
+    "@hono/zod-validator": "^0.9.1",
+    "@libsql/client": "^0.18.0",
+    "@neondatabase/serverless": "^1.2.0",
+    "axios": "^1.21.1",
+    "better-auth": "^1.7.22",
+    "dotenv": "^18.0.10",
+    "drizzle-orm": "^1.0.0-rc.5",
+    "hono": "^4.13.18",
+    "oracledb": "^26.0.0",
+    "pg": "^8.23.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "drizzle-kit": "^1.0.0-rc.5"
+  }
+}

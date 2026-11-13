@@ -1,0 +1,1 @@
+ALTER TABLE `account` ADD `uniqe_identification` text NOT NULL;
