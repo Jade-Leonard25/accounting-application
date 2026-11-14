@@ -21,6 +21,8 @@ const generateCustomId = (): string => {
   return `${block1}-${block2}-${block3}`; // Result looks like: 49v-82m-31k
 };
 export const auth = betterAuth({
+  baseURL:"http://localhost:4002",
+trustedOrigins:["http://localhost:5173"],
   database: drizzleAdapter(db, {
     provider: 'sqlite', // 👈 Update provider to sqlite since you migrated to Turso/SQLite
     schema,

@@ -1,0 +1,43 @@
+{
+  "name": "payroll_client_web_project",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview",
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.3.5",
+    "@tauri-apps/api": "^2.12.4",
+    "@tiptap/pm": "^3.34.0",
+    "@tiptap/starter-kit": "^3.34.0",
+    "@tiptap/vue-3": "^3.34.0",
+    "axios": "^1.21.1",
+    "better-auth": "^1.7.23",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "idb-keyval": "^6.3.0",
+    "motion-v": "^2.12.0",
+    "papaparse": "^5.7.1",
+    "tailwind-merge": "^3.7.0",
+    "tailwindcss": "^4.3.5",
+    "vue": "^3.5.44",
+    "xlsx": "^0.18.5",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.12.4",
+    "@types/node": "^24.19.2",
+    "@types/papaparse": "^5.5.2",
+    "@vitejs/plugin-vue": "^6.0.10",
+    "@vue/tsconfig": "^0.9.1",
+    "typescript": "~6.0.3",
+    "vite": "^8.3.6",
+    "vue-tsc": "^3.3.14"
+  }
+}
