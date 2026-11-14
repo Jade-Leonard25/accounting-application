@@ -26,16 +26,15 @@ release/
 *.dll
 *.so
 *.dylib
-
+go.sum
 # Test binary, built with 'go test -c'
 *.test
 
 # Output of the go coverage tool, specifically when created with individual packages
 *.out
-
+tmp
 # Dependency directories (only if vendor directory is used, usually Go modules handle this)
 # vendor/
-
 # Air (Live reload tool for Go) temporary files / build directories
 tmp/
 .air/
