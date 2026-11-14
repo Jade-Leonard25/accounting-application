@@ -30,6 +30,19 @@ const router = createRouter({
       component: () => import('../routers/Dashboard.vue'),
       meta: { requiresAuth: true },
     },
+    // 👇 Added Lazy Loaded Payroll Routes
+    {
+      path: '/payroll',
+      name: 'payroll',
+      component: () => import('../routers/PayrollView.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/payroll/templates',
+      name: 'payroll-templates',
+      component: () => import('../routers/PayrollView.vue'),
+      meta: { requiresAuth: true },
+    },
     // Dev only, remove before shipping
     ...(import.meta.env.DEV
       ? [{ path: '/tester', name: 'tester', component: () => import('../routers/Tewster.vue') }]

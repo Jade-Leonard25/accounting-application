@@ -12,6 +12,11 @@ import Table from '../components/Table.vue'
 import Sidebar from '../components/Sidebar.vue'
 import ImportCsv from '../components/ImportCsv.vue'
 import ThemeToggle from '../components/ThemeToggle.vue'
+
+// Import the new payroll components
+import PayrollGrid from '../components/PayrollGrid.vue'
+import PayslipEditor from '../components/PayslipEditor.vue'
+
 const router = useRouter()
 const session = useSession()
 
@@ -22,6 +27,8 @@ const draftCount = ref(0)
 const sidebarItems = computed(() => [
   { key: 'employees', label: 'Employees' },
   { key: 'import', label: 'Import CSV', badge: draftCount.value },
+  { key: 'payroll', label: 'Process Payroll' }, // 👈 Added
+  { key: 'templates', label: 'Payslip Template' }, // 👈 Added
 ])
 
 // ---- Types and state ---------------------------------------------------
@@ -58,7 +65,6 @@ const columns = [
   { key: 'actions', label: 'Actions', class: 'text-right', hideInDrawer: true, editable: false },
 ]
 
-// "name" isn't a field on the row, so add it for sorting and searching
 const rows = computed(() =>
   employees.value.map((e) => ({ ...e, name: `${e.first_name} ${e.last_name}` })),
 )
@@ -134,7 +140,6 @@ const fetchEmployees = async () => {
 
 onMounted(fetchEmployees)
 
-// After a CSV save: reload the list and switch back to Employees
 const onImported = () => {
   fetchEmployees()
   section.value = 'employees'
@@ -206,56 +211,59 @@ const handleLogout = async () => {
 
 const selectClass =
   'h-10 w-full rounded border border-slate-600 bg-slate-800 px-3 text-sm text-gray-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-400'
+
+// ---- Payroll state -----------------------------------------------------
+const selectedPayrollRow = ref<any>(null)
 </script>
 
 <template>
   <div class="flex min-h-screen flex-col bg-slate-900 text-gray-200">
-    <!-- ROOF: the top bar -->
-     
+    <!-- ROOF -->
     <nav class="flex items-center justify-between border-b border-slate-700 bg-slate-950 px-6 py-4">
-  <span class="text-xl font-bold text-white">Payroll Dashboard</span>
-  <ThemeToggle />
-</nav>
+      <span class="text-xl font-bold text-white">Payroll Dashboard</span>
+      <ThemeToggle />
+    </nav>
 
-    <!-- HOUSE: hallway on the left, room on the right -->
+    <!-- HOUSE -->
     <div class="flex flex-1">
-      <!-- HALLWAY: the sidebar with the doors -->
-     <Sidebar v-model="section" :items="sidebarItems">
-  <template #footer>
-    <div v-if="session.data?.user" class="flex items-center gap-3 px-1">
-      <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-500 text-sm font-semibold text-slate-950">
-        {{ (session.data.user.name || session.data.user.email || '?').charAt(0).toUpperCase() }}
-      </div>
-      <div class="min-w-0">
-        <p v-if="session.data.user.name" class="truncate text-sm font-medium text-white">
-          {{ session.data.user.name }}
-        </p>
-        <p class="truncate text-xs text-slate-400">{{ session.data.user.email }}</p>
-      </div>
-    </div>
-
-    <Dropdown side="top" align="start">
-      <template #trigger="{ toggle, open }">
-        <Button variant="destructive" size="sm" :aria-expanded="open" @click="toggle">
-          Logout
-        </Button>
-      </template>
-
-      <template #default="{ close }">
-        <div class="flex flex-col gap-3 p-2">
-          <p class="text-sm text-slate-300">Are you sure you want to log out?</p>
-          <div class="flex justify-end gap-2">
-            <Button variant="secondary" size="sm" @click="close()">Cancel</Button>
-            <Button variant="destructive" size="sm" @click="handleLogout">Logout</Button>
+      <!-- HALLWAY -->
+      <Sidebar v-model="section" :items="sidebarItems">
+        <template #footer>
+          <div v-if="session.data?.user" class="flex items-center gap-3 px-1">
+            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-green-500 text-sm font-semibold text-slate-950">
+              {{ (session.data.user.name || session.data.user.email || '?').charAt(0).toUpperCase() }}
+            </div>
+            <div class="min-w-0">
+              <p v-if="session.data.user.name" class="truncate text-sm font-medium text-white">
+                {{ session.data.user.name }}
+              </p>
+              <p class="truncate text-xs text-slate-400">{{ session.data.user.email }}</p>
+            </div>
           </div>
-        </div>
-      </template>
-    </Dropdown>
-  </template>
-</Sidebar>
 
-      <!-- ROOM: shows what the open door says -->
-      <main class="mx-auto min-w-0 max-w-6xl flex-1 p-6">
+          <Dropdown side="top" align="start">
+            <template #trigger="{ toggle, open }">
+              <Button variant="destructive" size="sm" :aria-expanded="open" @click="toggle">
+                Logout
+              </Button>
+            </template>
+
+            <template #default="{ close }">
+              <div class="flex flex-col gap-3 p-2">
+                <p class="text-sm text-slate-300">Are you sure you want to log out?</p>
+                <div class="flex justify-end gap-2">
+                  <Button variant="secondary" size="sm" @click="close()">Cancel</Button>
+                  <Button variant="destructive" size="sm" @click="handleLogout">Logout</Button>
+                </div>
+              </div>
+            </template>
+          </Dropdown>
+        </template>
+      </Sidebar>
+
+      <!-- ROOM -->
+      <main class="mx-auto min-w-0 max-w-7xl flex-1 p-6">
+        
         <!-- Door 1: Employees room -->
         <div v-if="section === 'employees'">
           <div class="mb-6 flex items-center justify-between">
@@ -265,16 +273,16 @@ const selectClass =
 
           <p v-if="error && !showModal" class="mb-4 text-red-400">{{ error }}</p>
 
-        <Table
-  :columns="columns"
-  :rows="rows"
-  :loading="loading"
-  row-drawer
-  editable
-  :on-save="saveEmployee"
-  :search-keys="['name', 'email', 'employment_status', 'tax_id']"
-  search-placeholder="Search employees..."
->
+          <Table
+            :columns="columns"
+            :rows="rows"
+            :loading="loading"
+            row-drawer
+            editable
+            :on-save="saveEmployee"
+            :search-keys="['name', 'email', 'employment_status', 'tax_id']"
+            search-placeholder="Search employees..."
+          >
             <template #cell-name="{ value }">
               <span class="font-medium text-white">{{ value }}</span>
             </template>
@@ -298,7 +306,33 @@ const selectClass =
         </div>
 
         <!-- Door 2: Import CSV room -->
-        <ImportCsv v-show="section === 'import'" v-model:count="draftCount" @saved="onImported" />
+        <div v-if="section === 'import'">
+          <ImportCsv v-model:count="draftCount" @saved="onImported" />
+        </div>
+
+        <!-- Door 3: Process Payroll room -->
+        <div v-if="section === 'payroll'">
+          <div class="mb-6">
+            <h1 class="text-2xl font-bold text-white">Process Payroll</h1>
+            <p class="text-slate-400 text-sm mt-1">Upload an Excel file or auto-compute deductions.</p>
+          </div>
+          <Card padding="none">
+            <PayrollGrid @select-payslip="selectedPayrollRow = $event" />
+          </Card>
+        </div>
+
+        <!-- Door 4: Payslip Template room -->
+        <div v-if="section === 'templates'">
+          <div class="mb-6">
+            <h1 class="text-2xl font-bold text-white">Payslip Template</h1>
+            <p class="text-slate-400 text-sm mt-1">Design the template that will be used when printing payslips.</p>
+          </div>
+          <Card padding="none">
+            <!-- If a payroll row is selected, pass it. Otherwise, show the live demo. -->
+            <PayslipEditor :selected-employee="selectedPayrollRow" />
+          </Card>
+        </div>
+
       </main>
     </div>
 
